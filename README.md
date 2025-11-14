@@ -14,7 +14,7 @@ This app helps collect availability from the engineering team for coverage durin
   - **Results view** (default) for admins to see all responses
 - **12 Team Members**: Pre-loaded with the on-call rotation list
 - **12 Coverage Days**: Automatically excludes holidays covered by support phone
-- **Auto-Save**: All votes persist in browser localStorage
+- **Real-Time Sync**: All votes sync across all users via Firebase Realtime Database
 - **Export Results**: Download formatted text file showing everyone's availability
 - **Share Link**: One-click copy of poll link to send to team
 
@@ -36,9 +36,18 @@ These days are covered by whoever holds the support phone:
 ## How to Use
 
 ### Setup
+
+**IMPORTANT: Firebase configuration required!**
+
 1. Clone this repository
-2. Open `index.html` in any modern web browser
-3. That's it! No build process, no dependencies.
+2. **Set up Firebase** (required for data persistence):
+   - Follow the detailed guide in [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
+   - Takes ~5 minutes
+   - Free tier is more than enough
+3. Update `app.js` with your Firebase credentials (lines 9-17)
+4. Open `index.html` in any modern web browser or deploy to GitHub Pages
+
+**Note:** Without Firebase configuration, the app will show an error. See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for step-by-step instructions.
 
 ### For Admins: Collecting Votes
 
@@ -79,7 +88,7 @@ These days are covered by whoever holds the support phone:
 - **HTML5**: Semantic markup
 - **CSS3**: Custom properties, Grid, Flexbox
 - **Vanilla JavaScript**: No frameworks or dependencies
-- **localStorage**: Client-side data persistence
+- **Firebase Realtime Database**: Cloud-synced data persistence
 
 ### Browser Compatibility
 Works on all modern browsers:
@@ -90,10 +99,12 @@ Works on all modern browsers:
 ### File Structure
 ```
 on-call-scheduling-app/
-├── index.html      # Main HTML structure
-├── styles.css      # All styling (Microsoft 365 inspired)
-├── app.js          # Application logic
-└── README.md       # This file
+├── index.html          # Main HTML structure
+├── styles.css          # All styling (Microsoft 365 inspired)
+├── app.js              # Application logic (includes Firebase config)
+├── README.md           # This file
+├── FIREBASE_SETUP.md   # Detailed Firebase setup guide
+└── .gitignore          # Git ignore file
 ```
 
 ## Customization

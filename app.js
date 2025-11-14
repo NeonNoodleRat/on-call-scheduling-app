@@ -1,6 +1,35 @@
 // Holiday Coverage Poll App
 // Doodle-style voting system
 
+// ============================================
+// FIREBASE CONFIGURATION
+// ============================================
+// TODO: Replace with your Firebase project credentials
+// Get these from Firebase Console > Project Settings > General > Your apps
+const firebaseConfig = {
+    apiKey: "AIzaSyCP89elvSeGIzVgV_n-k-DWBQDxCFPreLQ",
+    authDomain: "holiday-schedule-coverage.firebaseapp.com",
+    databaseURL: "https://holiday-schedule-coverage-default-rtdb.firebaseio.com",
+    projectId: "holiday-schedule-coverage",
+    storageBucket: "holiday-schedule-coverage.firebasestorage.app",
+    messagingSenderId: "764398854898",
+    appId: "1:764398854898:web:5c35dce6bca64666a7266b"
+};
+
+// Initialize Firebase
+let database;
+try {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    console.log('Firebase initialized successfully');
+} catch (error) {
+    console.error('Firebase initialization error:', error);
+    alert('Error connecting to database. Please check Firebase configuration.');
+}
+
+// ============================================
+// DATA CONFIGURATION
+// ============================================
 // Coverage days (excluding holidays covered by support phone)
 const coverageDays = [
     { id: 'mon-nov-24', label: 'Nov 24' },
@@ -282,21 +311,51 @@ function handleClearAllData() {
     }
 }
 
-// Save votes to localStorage
+// ============================================
+// FIREBASE DATABASE FUNCTIONS
+// ============================================
+
+// Save votes to Firebase
 function saveVotesToStorage() {
-    localStorage.setItem('holidayCoveragePollVotes', JSON.stringify(allVotes));
+    if (!database) {
+        console.error('Database not initialized');
+        return;
+    }
+
+    database.ref('votes').set(allVotes)
+        .then(() => {
+            console.log('Votes saved to Firebase');
+        })
+        .catch((error) => {
+            console.error('Error saving votes:', error);
+            alert('Error saving votes. Please try again.');
+        });
 }
 
-// Load votes from localStorage
+// Load votes from Firebase and listen for changes
 function loadVotesFromStorage() {
-    const saved = localStorage.getItem('holidayCoveragePollVotes');
-
-    if (saved) {
-        try {
-            allVotes = JSON.parse(saved);
-        } catch (error) {
-            console.error('Error loading votes:', error);
-            allVotes = {};
-        }
+    if (!database) {
+        console.error('Database not initialized');
+        return;
     }
+
+    // Listen for real-time updates
+    database.ref('votes').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            allVotes = data;
+            console.log('Votes loaded from Firebase:', allVotes);
+
+            // Update UI if we're in results view
+            if (!document.getElementById('resultsView').classList.contains('hidden')) {
+                renderResultsTable();
+            }
+        } else {
+            allVotes = {};
+            console.log('No votes found in database');
+        }
+    }, (error) => {
+        console.error('Error loading votes:', error);
+        allVotes = {};
+    });
 }
