@@ -203,9 +203,6 @@ function initializeResults() {
     // Handle export button
     document.getElementById('exportResults').addEventListener('click', handleExportResults);
 
-    // Handle clear all data button
-    document.getElementById('clearAllData').addEventListener('click', handleClearAllData);
-
     // Render results table
     renderResultsTable();
 }
