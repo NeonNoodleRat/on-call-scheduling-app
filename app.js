@@ -145,14 +145,20 @@ function handleVoteSubmit(e) {
         return;
     }
 
-    // Save this person's votes
-    allVotes[voterName] = { ...currentVotes };
-    saveVotesToStorage();
+    // Save this person's votes directly to Firebase (don't use allVotes)
+    if (!database) {
+        alert('Database not connected. Please refresh and try again.');
+        return;
+    }
 
-    alert(`Thank you, ${voterName}! Your availability has been recorded.`);
-
-    // Optionally redirect to results
-    // window.location.href = window.location.pathname;
+    database.ref(`votes/${voterName}`).set({ ...currentVotes })
+        .then(() => {
+            alert(`Thank you, ${voterName}! Your availability has been recorded.`);
+        })
+        .catch((error) => {
+            console.error('Error saving vote:', error);
+            alert('Error saving your vote. Please try again.');
+        });
 }
 
 // Handle clear votes
