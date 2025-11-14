@@ -1,19 +1,22 @@
-# Holiday Coverage Scheduler
+# Holiday Coverage Poll
 
-A simple, clean web app to manage holiday coverage scheduling for the engineering team.
+A simple, clean Doodle-style poll to collect team availability for holiday coverage scheduling.
 
 ## Overview
 
-This app helps coordinate coverage during office closures (Thanksgiving, Christmas, and New Year weeks). It automatically handles the 12 days that need coverage across the team (excluding holidays covered by the support phone rotation).
+This app helps collect availability from the engineering team for coverage during office closures (Thanksgiving, Christmas, and New Year weeks). It uses a poll system where each person votes on which days they're available, then an admin can review all responses to assign coverage.
 
 ## Features
 
-- **Simple Interface**: Clean, Microsoft 365-inspired design
+- **Doodle-Style Voting**: Click once for "Yes", twice for "If needed", three times to reset
+- **Two Views**:
+  - **Voting view** (`?vote` URL parameter) for team members to submit availability
+  - **Results view** (default) for admins to see all responses
 - **12 Team Members**: Pre-loaded with the on-call rotation list
 - **12 Coverage Days**: Automatically excludes holidays covered by support phone
-- **Auto-Save**: Schedule data persists in browser localStorage
-- **Export**: Download schedule as a formatted text file
-- **Coverage Summary**: Visual overview showing each person's assigned day(s)
+- **Auto-Save**: All votes persist in browser localStorage
+- **Export Results**: Download formatted text file showing everyone's availability
+- **Share Link**: One-click copy of poll link to send to team
 
 ## Coverage Details
 
@@ -37,19 +40,38 @@ These days are covered by whoever holds the support phone:
 2. Open `index.html` in any modern web browser
 3. That's it! No build process, no dependencies.
 
-### Assigning Coverage
-1. Select a person from the dropdown for each day
-2. The schedule auto-saves to your browser
-3. Check the "Coverage Summary" section to see who's assigned what
+### For Admins: Collecting Votes
+
+1. Open `index.html` in your browser (shows results view by default)
+2. Click "📋 Copy Poll Link" to get the voting URL
+3. Send the link to all team members via email or Teams
+4. Team members will vote on their availability
+5. Return to the results view to see all votes
+
+### For Team Members: Voting
+
+1. Click the poll link you received
+2. Select your name from the dropdown
+3. Click on days to indicate availability:
+   - **One click** = Green (Yes, I can cover)
+   - **Two clicks** = Yellow (If needed)
+   - **Three clicks** = White (No/reset)
+4. Click "Submit Vote" when done
+5. You can return anytime to update your votes
+
+### Viewing Results
+
+1. Open `index.html` without `?vote` parameter (or just open it normally)
+2. See a grid showing everyone's availability:
+   - **Green dot** = Available
+   - **Yellow dot** = If needed
+   - **White dot** = No response
+3. Click "Export Results" to download a text summary
 
 ### Exporting
-1. Click "Export to Text" to download a formatted schedule
-2. Share the text file via email or Teams
-3. Add coverage days to SharePoint calendar as "[Name] Holiday Coverage"
-
-### Clearing
-1. Click "Clear All" to reset the entire schedule
-2. Use the "Save Schedule" button to manually trigger a save (happens automatically on selection changes)
+1. Click "Export Results" to download a formatted summary
+2. Shows availability by person and by day
+3. Share with team or use to make coverage assignments
 
 ## Technical Details
 
@@ -77,23 +99,11 @@ on-call-scheduling-app/
 ## Customization
 
 ### Adding/Removing Team Members
-Edit the `teamMembers` array in [app.js](app.js:6-19):
-```javascript
-const teamMembers = [
-    'Matt',
-    'Robert',
-    // ... add or remove names here
-];
-```
+1. Edit the `teamMembers` array in [app.js](app.js:20-23)
+2. Update the name dropdown options in [index.html](index.html:60-74)
 
 ### Changing Coverage Days/Dates
-Edit the `coverageDays` array in [app.js](app.js:21-34) to adjust dates for different years:
-```javascript
-const coverageDays = [
-    { id: 'mon-nov-25', date: 'Nov 25', fullDate: 'Monday, November 25, 2024' },
-    // ... modify as needed
-];
-```
+Edit the `coverageDays` array in [app.js](app.js:5-18) to adjust dates for different years
 
 ### Styling
 All colors and design tokens are defined as CSS custom properties in [styles.css](styles.css:15-28):

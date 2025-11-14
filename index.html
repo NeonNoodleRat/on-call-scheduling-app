@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holiday Coverage Scheduler</title>
+    <title>Holiday Coverage Poll</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <!-- Poll Voting View (shown when ?vote is in URL) -->
+    <div id="voteView" class="container hidden">
         <header>
-            <h1>🎄 Holiday Coverage Scheduler</h1>
+            <h1>🎄 Holiday Coverage Poll</h1>
             <p class="subtitle">Engineering Team • 2024-2025</p>
         </header>
 
@@ -30,180 +31,208 @@
             </section>
 
             <section class="note-section">
-                <p><strong>Note:</strong> Thanksgiving Day, Christmas Day, and New Year's Eve are covered by whoever holds the support phone (check SharePoint calendar https://sharepoint.ins.healthcareintel.com/engineering/SitePages/Home.aspx).</p>
+                <p><strong>Note:</strong> Thanksgiving Day (Nov 28), Christmas Day (Dec 25), and New Year's Day (Jan 1) fall back to whoever holds the support phone that day (check SharePoint calendar).</p>
+                <p style="margin-top: 10px;"><strong>Your coverage day hours:</strong> 7am - 6pm CST. You don't have to stay online all day — just be available to match with support during these hours.</p>
             </section>
 
-            <section class="scheduling-section">
-                <!-- Thanksgiving Week -->
-                <div class="week-block">
-                    <h2>Thanksgiving Week</h2>
-                    <p class="week-dates">Nov 24-28, 2024</p>
-                    <div class="days-grid">
-                        <div class="day-card" data-date="2024-11-25">
-                            <div class="day-header">
-                                <span class="day-name">Monday</span>
-                                <span class="day-date">Nov 25</span>
-                            </div>
-                            <select class="person-select" data-day="mon-nov-25">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2024-11-26">
-                            <div class="day-header">
-                                <span class="day-name">Tuesday</span>
-                                <span class="day-date">Nov 26</span>
-                            </div>
-                            <select class="person-select" data-day="tue-nov-26">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2024-11-27">
-                            <div class="day-header">
-                                <span class="day-name">Wednesday</span>
-                                <span class="day-date">Nov 27</span>
-                            </div>
-                            <select class="person-select" data-day="wed-nov-27">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card excluded" data-date="2024-11-28">
-                            <div class="day-header">
-                                <span class="day-name">Thursday</span>
-                                <span class="day-date">Nov 28</span>
-                            </div>
-                            <div class="excluded-notice">Support Phone Coverage</div>
-                        </div>
-                        <div class="day-card" data-date="2024-11-29">
-                            <div class="day-header">
-                                <span class="day-name">Friday</span>
-                                <span class="day-date">Nov 29</span>
-                            </div>
-                            <select class="person-select" data-day="fri-nov-29">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
+            <section class="voting-legend">
+                <h3>How to vote:</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="vote-box vote-yes"></div>
+                        <span><strong>One click:</strong> Yes, I can cover</span>
                     </div>
-                </div>
-
-                <!-- Christmas Week -->
-                <div class="week-block">
-                    <h2>Christmas Week</h2>
-                    <p class="week-dates">Dec 22-26, 2024</p>
-                    <div class="days-grid">
-                        <div class="day-card" data-date="2024-12-23">
-                            <div class="day-header">
-                                <span class="day-name">Monday</span>
-                                <span class="day-date">Dec 23</span>
-                            </div>
-                            <select class="person-select" data-day="mon-dec-23">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2024-12-24">
-                            <div class="day-header">
-                                <span class="day-name">Tuesday</span>
-                                <span class="day-date">Dec 24</span>
-                            </div>
-                            <select class="person-select" data-day="tue-dec-24">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card excluded" data-date="2024-12-25">
-                            <div class="day-header">
-                                <span class="day-name">Wednesday</span>
-                                <span class="day-date">Dec 25</span>
-                            </div>
-                            <div class="excluded-notice">Support Phone Coverage</div>
-                        </div>
-                        <div class="day-card" data-date="2024-12-26">
-                            <div class="day-header">
-                                <span class="day-name">Thursday</span>
-                                <span class="day-date">Dec 26</span>
-                            </div>
-                            <select class="person-select" data-day="thu-dec-26">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2024-12-27">
-                            <div class="day-header">
-                                <span class="day-name">Friday</span>
-                                <span class="day-date">Dec 27</span>
-                            </div>
-                            <select class="person-select" data-day="fri-dec-27">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
+                    <div class="legend-item">
+                        <div class="vote-box vote-maybe"></div>
+                        <span><strong>Two clicks:</strong> If needed</span>
                     </div>
-                </div>
-
-                <!-- New Year Week -->
-                <div class="week-block">
-                    <h2>New Year Week</h2>
-                    <p class="week-dates">Dec 29 - Jan 2, 2025</p>
-                    <div class="days-grid">
-                        <div class="day-card" data-date="2024-12-30">
-                            <div class="day-header">
-                                <span class="day-name">Monday</span>
-                                <span class="day-date">Dec 30</span>
-                            </div>
-                            <select class="person-select" data-day="mon-dec-30">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card excluded" data-date="2024-12-31">
-                            <div class="day-header">
-                                <span class="day-name">Tuesday</span>
-                                <span class="day-date">Dec 31</span>
-                            </div>
-                            <div class="excluded-notice">Support Phone Coverage</div>
-                        </div>
-                        <div class="day-card" data-date="2025-01-01">
-                            <div class="day-header">
-                                <span class="day-name">Wednesday</span>
-                                <span class="day-date">Jan 1</span>
-                            </div>
-                            <select class="person-select" data-day="wed-jan-01">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2025-01-02">
-                            <div class="day-header">
-                                <span class="day-name">Thursday</span>
-                                <span class="day-date">Jan 2</span>
-                            </div>
-                            <select class="person-select" data-day="thu-jan-02">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
-                        <div class="day-card" data-date="2025-01-03">
-                            <div class="day-header">
-                                <span class="day-name">Friday</span>
-                                <span class="day-date">Jan 3</span>
-                            </div>
-                            <select class="person-select" data-day="fri-jan-03">
-                                <option value="">-- Select Person --</option>
-                            </select>
-                        </div>
+                    <div class="legend-item">
+                        <div class="vote-box vote-no"></div>
+                        <span><strong>Three clicks:</strong> No (back to default)</span>
                     </div>
                 </div>
             </section>
 
-            <section class="summary-section">
-                <h2>Coverage Summary</h2>
-                <div id="summary" class="summary-grid">
-                    <!-- Summary will be populated by JavaScript -->
-                </div>
-            </section>
+            <form id="voteForm">
+                <section class="voter-info">
+                    <h3>Your Information</h3>
+                    <div class="form-group">
+                        <label for="voterName">Your Name</label>
+                        <select id="voterName" required>
+                            <option value="">-- Select your name --</option>
+                            <option value="Matt">Matt</option>
+                            <option value="Robert">Robert</option>
+                            <option value="Gerald">Gerald</option>
+                            <option value="Ellie">Ellie</option>
+                            <option value="Chris S">Chris S</option>
+                            <option value="Eri">Eri</option>
+                            <option value="Joe">Joe</option>
+                            <option value="Jeremy">Jeremy</option>
+                            <option value="Jud">Jud</option>
+                            <option value="Emil">Emil</option>
+                            <option value="Chris E">Chris E</option>
+                            <option value="Jason">Jason</option>
+                        </select>
+                    </div>
+                </section>
 
+                <section class="poll-section">
+                    <!-- Thanksgiving Week -->
+                    <div class="week-block">
+                        <h2>Thanksgiving Week</h2>
+                        <p class="week-dates">Nov 24-28, 2024</p>
+                        <div class="poll-grid">
+                            <div class="poll-day">
+                                <div class="day-header">Monday<br><span class="date">Nov 24</span></div>
+                                <div class="vote-cell" data-day="mon-nov-24">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Tuesday<br><span class="date">Nov 25</span></div>
+                                <div class="vote-cell" data-day="tue-nov-25">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Wednesday<br><span class="date">Nov 26</span></div>
+                                <div class="vote-cell" data-day="wed-nov-26">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Thursday<br><span class="date">Nov 27</span></div>
+                                <div class="vote-cell" data-day="thu-nov-27">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day excluded">
+                                <div class="day-header">Friday<br><span class="date">Nov 28</span></div>
+                                <div class="vote-cell">
+                                    <div class="excluded-notice">Support Phone</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Christmas Week -->
+                    <div class="week-block">
+                        <h2>Christmas Week</h2>
+                        <p class="week-dates">Dec 23-27, 2024</p>
+                        <div class="poll-grid">
+                            <div class="poll-day">
+                                <div class="day-header">Monday<br><span class="date">Dec 23</span></div>
+                                <div class="vote-cell" data-day="mon-dec-23">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Tuesday<br><span class="date">Dec 24</span></div>
+                                <div class="vote-cell" data-day="tue-dec-24">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day excluded">
+                                <div class="day-header">Wednesday<br><span class="date">Dec 25</span></div>
+                                <div class="vote-cell">
+                                    <div class="excluded-notice">Support Phone</div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Thursday<br><span class="date">Dec 26</span></div>
+                                <div class="vote-cell" data-day="thu-dec-26">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Friday<br><span class="date">Dec 27</span></div>
+                                <div class="vote-cell" data-day="fri-dec-27">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Year Week -->
+                    <div class="week-block">
+                        <h2>New Year Week</h2>
+                        <p class="week-dates">Dec 30 - Jan 3, 2025</p>
+                        <div class="poll-grid">
+                            <div class="poll-day">
+                                <div class="day-header">Monday<br><span class="date">Dec 30</span></div>
+                                <div class="vote-cell" data-day="mon-dec-30">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day excluded">
+                                <div class="day-header">Tuesday<br><span class="date">Dec 31</span></div>
+                                <div class="vote-cell">
+                                    <div class="excluded-notice">Support Phone</div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Wednesday<br><span class="date">Jan 1</span></div>
+                                <div class="vote-cell" data-day="wed-jan-01">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Thursday<br><span class="date">Jan 2</span></div>
+                                <div class="vote-cell" data-day="thu-jan-02">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                            <div class="poll-day">
+                                <div class="day-header">Friday<br><span class="date">Jan 3</span></div>
+                                <div class="vote-cell" data-day="fri-jan-03">
+                                    <div class="vote-box"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="actions-section">
+                    <button type="submit" class="btn btn-primary">Submit Vote</button>
+                    <button type="button" id="clearVoteBtn" class="btn btn-secondary">Clear My Votes</button>
+                </section>
+            </form>
+        </main>
+
+        <footer>
+            <p>Be available via phone, email, or Teams during your selected coverage day (7am-6pm CST)</p>
+        </footer>
+    </div>
+
+    <!-- Results View (admin/default view) -->
+    <div id="resultsView" class="container">
+        <header>
+            <h1>🎄 Holiday Coverage Poll Results</h1>
+            <p class="subtitle">Engineering Team • 2024-2025</p>
+        </header>
+
+        <main>
             <section class="actions-section">
-                <button id="saveBtn" class="btn btn-primary">Save Schedule</button>
-                <button id="exportBtn" class="btn btn-secondary">Export to Text</button>
-                <button id="clearBtn" class="btn btn-danger">Clear All</button>
+                <button id="shareLink" class="btn btn-primary">📋 Copy Poll Link</button>
+                <button id="exportResults" class="btn btn-secondary">Export Results</button>
+                <button id="clearAllData" class="btn btn-danger">Clear All Votes</button>
+            </section>
+
+            <section class="note-section">
+                <p><strong>Legend:</strong>
+                    <span class="vote-badge vote-yes-badge">●</span> Yes
+                    <span class="vote-badge vote-maybe-badge">●</span> If needed
+                    <span class="vote-badge vote-no-badge">○</span> No response
+                </p>
+            </section>
+
+            <section class="results-section">
+                <div id="resultsTable"></div>
             </section>
         </main>
 
         <footer>
-            <p>Make sure each person is reachable via phone, email, or Teams during their coverage day.</p>
+            <p>Send the poll link to team members to collect their availability</p>
         </footer>
     </div>
 

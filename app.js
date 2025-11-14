@@ -1,254 +1,302 @@
-// Holiday Coverage Scheduler App
-// Simple vanilla JavaScript implementation
-
-// Team roster
-const teamMembers = [
-    'Matt',
-    'Robert',
-    'Gerald',
-    'Ellie',
-    'Chris S',
-    'Eri',
-    'Joe',
-    'Jeremy',
-    'Jud',
-    'Emil',
-    'Chris E',
-    'Jason'
-];
+// Holiday Coverage Poll App
+// Doodle-style voting system
 
 // Coverage days (excluding holidays covered by support phone)
 const coverageDays = [
-    { id: 'mon-nov-25', date: 'Nov 25', fullDate: 'Monday, November 25, 2024' },
-    { id: 'tue-nov-26', date: 'Nov 26', fullDate: 'Tuesday, November 26, 2024' },
-    { id: 'wed-nov-27', date: 'Nov 27', fullDate: 'Wednesday, November 27, 2024' },
-    { id: 'fri-nov-29', date: 'Nov 29', fullDate: 'Friday, November 29, 2024' },
-    { id: 'mon-dec-23', date: 'Dec 23', fullDate: 'Monday, December 23, 2024' },
-    { id: 'tue-dec-24', date: 'Dec 24', fullDate: 'Tuesday, December 24, 2024' },
-    { id: 'thu-dec-26', date: 'Dec 26', fullDate: 'Thursday, December 26, 2024' },
-    { id: 'fri-dec-27', date: 'Dec 27', fullDate: 'Friday, December 27, 2024' },
-    { id: 'mon-dec-30', date: 'Dec 30', fullDate: 'Monday, December 30, 2024' },
-    { id: 'wed-jan-01', date: 'Jan 1', fullDate: 'Wednesday, January 1, 2025' },
-    { id: 'thu-jan-02', date: 'Jan 2', fullDate: 'Thursday, January 2, 2025' },
-    { id: 'fri-jan-03', date: 'Jan 3', fullDate: 'Friday, January 3, 2025' }
+    { id: 'mon-nov-24', label: 'Nov 24' },
+    { id: 'tue-nov-25', label: 'Nov 25' },
+    { id: 'wed-nov-26', label: 'Nov 26' },
+    { id: 'thu-nov-27', label: 'Nov 27' },
+    { id: 'mon-dec-23', label: 'Dec 23' },
+    { id: 'tue-dec-24', label: 'Dec 24' },
+    { id: 'thu-dec-26', label: 'Dec 26' },
+    { id: 'fri-dec-27', label: 'Dec 27' },
+    { id: 'mon-dec-30', label: 'Dec 30' },
+    { id: 'wed-jan-01', label: 'Jan 1' },
+    { id: 'thu-jan-02', label: 'Jan 2' },
+    { id: 'fri-jan-03', label: 'Jan 3' }
 ];
 
-// State management
-let schedule = {};
+// Team members
+const teamMembers = [
+    'Matt', 'Robert', 'Gerald', 'Ellie', 'Chris S', 'Eri',
+    'Joe', 'Jeremy', 'Jud', 'Emil', 'Chris E', 'Jason'
+];
+
+// Vote states: 'no' (default), 'yes', 'maybe'
+let currentVotes = {};
+
+// All votes stored by person
+let allVotes = {};
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    initializeSelects();
-    loadSchedule();
-    attachEventListeners();
-    updateSummary();
+    loadVotesFromStorage();
+
+    // Check if we're in voting mode or results mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const isVoteMode = urlParams.has('vote');
+
+    if (isVoteMode) {
+        showVoteView();
+    } else {
+        showResultsView();
+    }
 });
 
-// Populate all select dropdowns with team members
-function initializeSelects() {
-    const selects = document.querySelectorAll('.person-select');
+// Show voting view
+function showVoteView() {
+    document.getElementById('voteView').classList.remove('hidden');
+    document.getElementById('resultsView').classList.add('hidden');
 
-    selects.forEach(select => {
-        // Add team members as options
-        teamMembers.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member;
-            option.textContent = member;
-            select.appendChild(option);
+    initializeVoting();
+}
+
+// Show results view
+function showResultsView() {
+    document.getElementById('voteView').classList.add('hidden');
+    document.getElementById('resultsView').classList.remove('hidden');
+
+    initializeResults();
+}
+
+// Initialize voting interface
+function initializeVoting() {
+    // Handle vote box clicks
+    const voteBoxes = document.querySelectorAll('.vote-cell[data-day] .vote-box');
+    voteBoxes.forEach(box => {
+        box.addEventListener('click', handleVoteClick);
+    });
+
+    // Handle form submission
+    document.getElementById('voteForm').addEventListener('submit', handleVoteSubmit);
+
+    // Handle clear votes button
+    document.getElementById('clearVoteBtn').addEventListener('click', handleClearVotes);
+
+    // Try to load existing vote for selected person
+    document.getElementById('voterName').addEventListener('change', loadExistingVote);
+}
+
+// Handle vote box click - cycle through states
+function handleVoteClick(e) {
+    const voteBox = e.target;
+    const day = voteBox.closest('.vote-cell').dataset.day;
+
+    // Cycle through states: no -> yes -> maybe -> no
+    let currentState = currentVotes[day] || 'no';
+    let nextState;
+
+    if (currentState === 'no') {
+        nextState = 'yes';
+    } else if (currentState === 'yes') {
+        nextState = 'maybe';
+    } else {
+        nextState = 'no';
+    }
+
+    currentVotes[day] = nextState;
+    updateVoteBoxDisplay(voteBox, nextState);
+}
+
+// Update vote box visual state
+function updateVoteBoxDisplay(voteBox, state) {
+    voteBox.classList.remove('vote-yes', 'vote-maybe', 'vote-no');
+    voteBox.classList.add(`vote-${state}`);
+}
+
+// Handle vote submission
+function handleVoteSubmit(e) {
+    e.preventDefault();
+
+    const voterName = document.getElementById('voterName').value;
+
+    if (!voterName) {
+        alert('Please select your name');
+        return;
+    }
+
+    // Save this person's votes
+    allVotes[voterName] = { ...currentVotes };
+    saveVotesToStorage();
+
+    alert(`Thank you, ${voterName}! Your availability has been recorded.`);
+
+    // Optionally redirect to results
+    // window.location.href = window.location.pathname;
+}
+
+// Handle clear votes
+function handleClearVotes() {
+    if (confirm('Clear all your selections?')) {
+        currentVotes = {};
+
+        // Reset all vote boxes
+        const voteBoxes = document.querySelectorAll('.vote-cell[data-day] .vote-box');
+        voteBoxes.forEach(box => {
+            updateVoteBoxDisplay(box, 'no');
+        });
+    }
+}
+
+// Load existing vote for a person
+function loadExistingVote() {
+    const voterName = document.getElementById('voterName').value;
+
+    if (voterName && allVotes[voterName]) {
+        // Load this person's existing votes
+        currentVotes = { ...allVotes[voterName] };
+
+        // Update UI
+        const voteBoxes = document.querySelectorAll('.vote-cell[data-day] .vote-box');
+        voteBoxes.forEach(box => {
+            const day = box.closest('.vote-cell').dataset.day;
+            const state = currentVotes[day] || 'no';
+            updateVoteBoxDisplay(box, state);
+        });
+    } else {
+        // Clear votes for new person
+        handleClearVotes();
+    }
+}
+
+// Initialize results view
+function initializeResults() {
+    // Handle share link button
+    document.getElementById('shareLink').addEventListener('click', handleShareLink);
+
+    // Handle export button
+    document.getElementById('exportResults').addEventListener('click', handleExportResults);
+
+    // Handle clear all data button
+    document.getElementById('clearAllData').addEventListener('click', handleClearAllData);
+
+    // Render results table
+    renderResultsTable();
+}
+
+// Render the results table
+function renderResultsTable() {
+    const resultsTable = document.getElementById('resultsTable');
+
+    // Create table structure
+    let html = '<div class="results-grid">';
+
+    // Header row
+    html += '<div class="results-header">Name</div>';
+    coverageDays.forEach(day => {
+        html += `<div class="results-header">${day.label}</div>`;
+    });
+
+    // Data rows
+    teamMembers.forEach(person => {
+        html += '<div class="results-row">';
+        html += `<div class="results-cell">${person}</div>`;
+
+        coverageDays.forEach(day => {
+            const vote = allVotes[person]?.[day.id] || 'no';
+            const indicatorClass = vote === 'yes' ? 'yes' : vote === 'maybe' ? 'maybe' : 'no';
+            html += `<div class="results-cell"><div class="vote-indicator ${indicatorClass}"></div></div>`;
         });
 
-        // Listen for changes
-        select.addEventListener('change', (e) => {
-            handleSelectionChange(e.target);
-        });
+        html += '</div>';
+    });
+
+    html += '</div>';
+
+    resultsTable.innerHTML = html;
+}
+
+// Handle share link
+function handleShareLink() {
+    const voteUrl = window.location.origin + window.location.pathname + '?vote';
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(voteUrl).then(() => {
+        alert('Poll link copied to clipboard!\n\n' + voteUrl);
+    }).catch(() => {
+        // Fallback if clipboard API fails
+        prompt('Copy this link:', voteUrl);
     });
 }
 
-// Handle selection change
-function handleSelectionChange(selectElement) {
-    const day = selectElement.dataset.day;
-    const person = selectElement.value;
+// Handle export results
+function handleExportResults() {
+    let output = 'HOLIDAY COVERAGE POLL RESULTS\n';
+    output += 'Engineering Team • 2024-2025\n';
+    output += '='.repeat(80) + '\n\n';
 
-    if (person) {
-        schedule[day] = person;
-    } else {
-        delete schedule[day];
-    }
+    output += 'Legend: [Y] = Yes, can cover | [M] = Maybe, if needed | [ ] = No response\n\n';
 
-    updateSummary();
-    saveSchedule();
-}
+    // Create a table
+    output += 'Name'.padEnd(15);
+    coverageDays.forEach(day => {
+        output += day.label.padEnd(8);
+    });
+    output += '\n' + '-'.repeat(15 + (coverageDays.length * 8)) + '\n';
 
-// Update the summary section
-function updateSummary() {
-    const summaryDiv = document.getElementById('summary');
-    summaryDiv.innerHTML = '';
+    teamMembers.forEach(person => {
+        output += person.padEnd(15);
 
-    // Create a map of person -> days
-    const personDays = {};
+        coverageDays.forEach(day => {
+            const vote = allVotes[person]?.[day.id] || 'no';
+            const symbol = vote === 'yes' ? '[Y]' : vote === 'maybe' ? '[M]' : '[ ]';
+            output += symbol.padEnd(8);
+        });
+
+        output += '\n';
+    });
+
+    output += '\n' + '='.repeat(80) + '\n';
+    output += 'AVAILABILITY SUMMARY BY DAY\n';
+    output += '='.repeat(80) + '\n\n';
 
     coverageDays.forEach(day => {
-        const person = schedule[day.id];
-        if (person) {
-            if (!personDays[person]) {
-                personDays[person] = [];
-            }
-            personDays[person].push(day.date);
-        }
+        const yesVotes = teamMembers.filter(p => allVotes[p]?.[day.id] === 'yes');
+        const maybeVotes = teamMembers.filter(p => allVotes[p]?.[day.id] === 'maybe');
+
+        output += `${day.label}:\n`;
+        output += `  Available (${yesVotes.length}): ${yesVotes.join(', ') || 'None'}\n`;
+        output += `  If Needed (${maybeVotes.length}): ${maybeVotes.join(', ') || 'None'}\n\n`;
     });
 
-    // Show each team member and their assignment
-    teamMembers.forEach(member => {
-        const summaryItem = document.createElement('div');
-        summaryItem.className = 'summary-item';
-
-        const days = personDays[member];
-        if (days && days.length > 0) {
-            summaryItem.classList.add('complete');
-            summaryItem.innerHTML = `
-                <strong>${member}</strong>
-                <span>${days.join(', ')}</span>
-            `;
-        } else {
-            summaryItem.classList.add('incomplete');
-            summaryItem.innerHTML = `
-                <strong>${member}</strong>
-                <span class="text-danger">Not assigned</span>
-            `;
-        }
-
-        summaryDiv.appendChild(summaryItem);
-    });
-}
-
-// Save schedule to localStorage
-function saveSchedule() {
-    localStorage.setItem('holidayCoverageSchedule', JSON.stringify(schedule));
-}
-
-// Load schedule from localStorage
-function loadSchedule() {
-    const saved = localStorage.getItem('holidayCoverageSchedule');
-
-    if (saved) {
-        try {
-            schedule = JSON.parse(saved);
-
-            // Populate the selects with saved values
-            Object.keys(schedule).forEach(day => {
-                const select = document.querySelector(`select[data-day="${day}"]`);
-                if (select) {
-                    select.value = schedule[day];
-                }
-            });
-        } catch (error) {
-            console.error('Error loading schedule:', error);
-            schedule = {};
-        }
-    }
-}
-
-// Attach event listeners to buttons
-function attachEventListeners() {
-    // Save button
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        saveSchedule();
-        showNotification('Schedule saved successfully!', 'success');
-    });
-
-    // Export button
-    document.getElementById('exportBtn').addEventListener('click', exportToText);
-
-    // Clear button
-    document.getElementById('clearBtn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear all assignments?')) {
-            clearSchedule();
-        }
-    });
-}
-
-// Export schedule to text format
-function exportToText() {
-    let output = 'HOLIDAY COVERAGE SCHEDULE 2024-2025\n';
-    output += 'Engineering Team\n';
-    output += '=' .repeat(50) + '\n\n';
-
-    output += 'Coverage Hours: 7am - 6pm CST\n';
-    output += 'Contact: Phone, Email, or Teams\n\n';
-
-    output += 'NOTE: Thanksgiving Day (Nov 28), Christmas Day (Dec 25), and\n';
-    output += 'New Year\'s Eve (Dec 31) are covered by support phone rotation.\n';
-    output += '=' .repeat(50) + '\n\n';
-
-    // Group by week
-    output += 'THANKSGIVING WEEK (Nov 24-28)\n';
-    output += '-'.repeat(50) + '\n';
-    ['mon-nov-25', 'tue-nov-26', 'wed-nov-27', 'fri-nov-29'].forEach(dayId => {
-        const day = coverageDays.find(d => d.id === dayId);
-        const person = schedule[dayId] || 'UNASSIGNED';
-        output += `${day.fullDate}: ${person}\n`;
-    });
-
-    output += '\nCHRISTMAS WEEK (Dec 22-26)\n';
-    output += '-'.repeat(50) + '\n';
-    ['mon-dec-23', 'tue-dec-24', 'thu-dec-26', 'fri-dec-27'].forEach(dayId => {
-        const day = coverageDays.find(d => d.id === dayId);
-        const person = schedule[dayId] || 'UNASSIGNED';
-        output += `${day.fullDate}: ${person}\n`;
-    });
-
-    output += '\nNEW YEAR WEEK (Dec 29 - Jan 2)\n';
-    output += '-'.repeat(50) + '\n';
-    ['mon-dec-30', 'wed-jan-01', 'thu-jan-02', 'fri-jan-03'].forEach(dayId => {
-        const day = coverageDays.find(d => d.id === dayId);
-        const person = schedule[dayId] || 'UNASSIGNED';
-        output += `${day.fullDate}: ${person}\n`;
-    });
-
-    output += '\n' + '='.repeat(50) + '\n';
-    output += 'SUMMARY BY PERSON\n';
-    output += '='.repeat(50) + '\n';
-
-    teamMembers.forEach(member => {
-        const days = coverageDays.filter(day => schedule[day.id] === member);
-        if (days.length > 0) {
-            output += `${member}: ${days.map(d => d.date).join(', ')}\n`;
-        } else {
-            output += `${member}: NOT ASSIGNED\n`;
-        }
-    });
-
-    // Create a downloadable text file
+    // Download as text file
     const blob = new Blob([output], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'holiday-coverage-schedule.txt';
+    a.download = 'holiday-coverage-poll-results.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
-    showNotification('Schedule exported successfully!', 'success');
 }
 
-// Clear all schedule data
-function clearSchedule() {
-    schedule = {};
-    localStorage.removeItem('holidayCoverageSchedule');
-
-    // Reset all selects
-    const selects = document.querySelectorAll('.person-select');
-    selects.forEach(select => {
-        select.value = '';
-    });
-
-    updateSummary();
-    showNotification('Schedule cleared', 'warning');
+// Handle clear all data
+function handleClearAllData() {
+    if (confirm('Are you sure you want to delete ALL votes? This cannot be undone.')) {
+        allVotes = {};
+        saveVotesToStorage();
+        renderResultsTable();
+        alert('All votes have been cleared.');
+    }
 }
 
-// Show notification (simple alert for now)
-function showNotification(message, type) {
-    // For simplicity, using alert. Can be enhanced with custom toast notifications
-    alert(message);
+// Save votes to localStorage
+function saveVotesToStorage() {
+    localStorage.setItem('holidayCoveragePollVotes', JSON.stringify(allVotes));
+}
+
+// Load votes from localStorage
+function loadVotesFromStorage() {
+    const saved = localStorage.getItem('holidayCoveragePollVotes');
+
+    if (saved) {
+        try {
+            allVotes = JSON.parse(saved);
+        } catch (error) {
+            console.error('Error loading votes:', error);
+            allVotes = {};
+        }
+    }
 }
