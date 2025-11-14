@@ -6,15 +6,14 @@ const coverageDays = [
     { id: 'mon-nov-24', label: 'Nov 24' },
     { id: 'tue-nov-25', label: 'Nov 25' },
     { id: 'wed-nov-26', label: 'Nov 26' },
-    { id: 'thu-nov-27', label: 'Nov 27' },
-    { id: 'mon-dec-23', label: 'Dec 23' },
-    { id: 'tue-dec-24', label: 'Dec 24' },
-    { id: 'thu-dec-26', label: 'Dec 26' },
-    { id: 'fri-dec-27', label: 'Dec 27' },
-    { id: 'mon-dec-30', label: 'Dec 30' },
-    { id: 'wed-jan-01', label: 'Jan 1' },
-    { id: 'thu-jan-02', label: 'Jan 2' },
-    { id: 'fri-jan-03', label: 'Jan 3' }
+    { id: 'fri-nov-28', label: 'Nov 28' },
+    { id: 'mon-dec-22', label: 'Dec 22' },
+    { id: 'tue-dec-23', label: 'Dec 23' },
+    { id: 'wed-dec-24', label: 'Dec 24' },
+    { id: 'fri-dec-26', label: 'Dec 26' },
+    { id: 'mon-dec-29', label: 'Dec 29' },
+    { id: 'tue-dec-30', label: 'Dec 30' },
+    { id: 'fri-jan-02', label: 'Jan 2' }
 ];
 
 // Team members
