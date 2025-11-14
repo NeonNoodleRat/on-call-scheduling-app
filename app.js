@@ -252,7 +252,7 @@ function handleShareLink() {
 // Handle export results
 function handleExportResults() {
     let output = 'HOLIDAY COVERAGE POLL RESULTS\n';
-    output += 'Engineering Team • 2024-2025\n';
+    output += 'Engineering Team • 2025-2026\n';
     output += '='.repeat(80) + '\n\n';
 
     output += 'Legend: [Y] = Yes, can cover | [M] = Maybe, if needed | [ ] = No response\n\n';
