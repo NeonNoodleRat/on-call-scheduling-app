@@ -13,6 +13,7 @@ const coverageDays = [
     { id: 'fri-dec-26', label: 'Dec 26' },
     { id: 'mon-dec-29', label: 'Dec 29' },
     { id: 'tue-dec-30', label: 'Dec 30' },
+    { id: 'thu-jan-01', label: 'Jan 1' },
     { id: 'fri-jan-02', label: 'Jan 2' }
 ];
 
